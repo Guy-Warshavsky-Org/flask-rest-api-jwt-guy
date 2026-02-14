@@ -35,9 +35,11 @@ def create_app(config_name='default'):
     from .resources.stores import stores_bp
     from .resources.tags import tags_bp
     from .resources.items import items_bp
+    from .resources.health import health_bp
     app.register_blueprint(users_bp)
     app.register_blueprint(stores_bp)
     app.register_blueprint(tags_bp)
     app.register_blueprint(items_bp)
+    app.register_blueprint(health_bp)
 
     return app
