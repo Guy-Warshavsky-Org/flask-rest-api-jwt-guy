@@ -89,6 +89,7 @@ replay_pid*
 *.db
 *.sqlite
 data-dev.sqlite
+data-dev.db
 
 # ----- C# / .NET -----
 [Bb]in/
