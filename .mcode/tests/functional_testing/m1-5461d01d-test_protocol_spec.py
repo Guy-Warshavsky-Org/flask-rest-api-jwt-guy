@@ -9,7 +9,7 @@ This script supports two modes:
 1. SRC Validation: Tests endpoints and captures responses (no expected_response)
 2. DST Contract Validation: Tests endpoints and validates responses match expected (has expected_response)
 
-Generated at: 2026-03-01T18:11:35.792521+00:00
+Generated at: 2026-03-01T18:16:59.567969+00:00
 Project: flask-rest-api-jwt-guy
 Milestone: 1
 """
@@ -99,7 +99,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "category": "MISSING_REQUIRED",
         "endpoint": "/user/register",
         "method": "POST",
-        "description": "Register with missing username field, expect 400 or 500 error",
+        "description": "Register with missing username field, expect 500 (no input validation, KeyError on missing key)",
         "setup": null,
         "request_data": {
             "path": {},
@@ -108,7 +108,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
                 "password": "${TEST_PASSWORD}"
             }
         },
-        "expected_status": 400,
+        "expected_status": 500,
         "cleanup": null
     },
     {
@@ -409,8 +409,8 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
 )
 
 # Base URL for API requests (from app discovery, includes host:port)
-BASE_URL = os.path.expandvars("")
-HEALTH_CHECK_ENDPOINT = os.path.expandvars("")
+BASE_URL = os.path.expandvars("http://localhost:5000")
+HEALTH_CHECK_ENDPOINT = os.path.expandvars("/health/")
 REQUEST_TIMEOUT = 30
 HEALTH_CHECK_URL = f"{BASE_URL.rstrip('/')}/{HEALTH_CHECK_ENDPOINT.lstrip('/')}"
 
