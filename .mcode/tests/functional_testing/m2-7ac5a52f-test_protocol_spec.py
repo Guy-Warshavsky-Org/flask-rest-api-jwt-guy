@@ -9,7 +9,7 @@ This script supports two modes:
 1. SRC Validation: Tests endpoints and captures responses (no expected_response)
 2. DST Contract Validation: Tests endpoints and validates responses match expected (has expected_response)
 
-Generated at: 2026-03-01T18:27:54.421091+00:00
+Generated at: 2026-03-01T18:30:43.451658+00:00
 Project: flask-rest-api-jwt-guy
 Milestone: 2
 """
@@ -60,6 +60,9 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "request_data": {
             "path": {},
             "query": {},
+            "headers": {
+                "Authorization": "Bearer $fresh_access_token"
+            },
             "body": {
                 "name": "My Test Store"
             }
@@ -68,8 +71,11 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "cleanup": {
             "endpoint": "/store/{id}",
             "method": "DELETE",
+            "headers": {
+                "Authorization": "Bearer $fresh_access_token"
+            },
             "path": {
-                "id": "$response.id"
+                "id": "$setup_id"
             }
         }
     },
@@ -82,6 +88,9 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "setup": {
             "endpoint": "/store/",
             "method": "POST",
+            "headers": {
+                "Authorization": "Bearer $fresh_access_token"
+            },
             "body": {
                 "name": "Store To Retrieve"
             },
@@ -92,12 +101,18 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
                 "id": "$setup_id"
             },
             "query": {},
+            "headers": {
+                "Authorization": "Bearer $fresh_access_token"
+            },
             "body": null
         },
         "expected_status": 200,
         "cleanup": {
             "endpoint": "/store/{id}",
             "method": "DELETE",
+            "headers": {
+                "Authorization": "Bearer $fresh_access_token"
+            },
             "path": {
                 "id": "$setup_id"
             }
@@ -115,6 +130,9 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
                 "id": 99999
             },
             "query": {},
+            "headers": {
+                "Authorization": "Bearer $fresh_access_token"
+            },
             "body": null
         },
         "expected_status": 404,
@@ -130,6 +148,9 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "request_data": {
             "path": {},
             "query": {},
+            "headers": {
+                "Authorization": "Bearer $fresh_access_token"
+            },
             "body": null
         },
         "expected_status": 200,
@@ -144,6 +165,9 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "setup": {
             "endpoint": "/store/",
             "method": "POST",
+            "headers": {
+                "Authorization": "Bearer $fresh_access_token"
+            },
             "body": {
                 "name": "Store To Delete"
             },
@@ -154,6 +178,9 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
                 "id": "$setup_id"
             },
             "query": {},
+            "headers": {
+                "Authorization": "Bearer $fresh_access_token"
+            },
             "body": null
         },
         "expected_status": 200,
@@ -171,6 +198,9 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
                 "id": 99999
             },
             "query": {},
+            "headers": {
+                "Authorization": "Bearer $fresh_access_token"
+            },
             "body": null
         },
         "expected_status": 404,
@@ -185,6 +215,9 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "setup": {
             "endpoint": "/store/",
             "method": "POST",
+            "headers": {
+                "Authorization": "Bearer $fresh_access_token"
+            },
             "body": {
                 "name": "Store For Item"
             },
@@ -193,6 +226,9 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "request_data": {
             "path": {},
             "query": {},
+            "headers": {
+                "Authorization": "Bearer $fresh_access_token"
+            },
             "body": {
                 "name": "Test Widget",
                 "price": 9.99,
@@ -203,6 +239,9 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "cleanup": {
             "endpoint": "/store/{id}",
             "method": "DELETE",
+            "headers": {
+                "Authorization": "Bearer $fresh_access_token"
+            },
             "path": {
                 "id": "$setup_id"
             }
@@ -218,6 +257,9 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "request_data": {
             "path": {},
             "query": {},
+            "headers": {
+                "Authorization": "Bearer $fresh_access_token"
+            },
             "body": {
                 "name": "Orphan Item",
                 "price": 5.5,
@@ -237,6 +279,9 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "request_data": {
             "path": {},
             "query": {},
+            "headers": {
+                "Authorization": "Bearer $fresh_access_token"
+            },
             "body": null
         },
         "expected_status": 200,
@@ -254,6 +299,9 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
                 "id": 99999
             },
             "query": {},
+            "headers": {
+                "Authorization": "Bearer $fresh_access_token"
+            },
             "body": null
         },
         "expected_status": 404,
@@ -271,6 +319,9 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
                 "id": 99999
             },
             "query": {},
+            "headers": {
+                "Authorization": "Bearer $fresh_access_token"
+            },
             "body": {
                 "name": "Updated Widget",
                 "price": 19.99
@@ -291,6 +342,9 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
                 "id": 99999
             },
             "query": {},
+            "headers": {
+                "Authorization": "Bearer $fresh_access_token"
+            },
             "body": null
         },
         "expected_status": 404,
@@ -305,6 +359,9 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "setup": {
             "endpoint": "/store/",
             "method": "POST",
+            "headers": {
+                "Authorization": "Bearer $fresh_access_token"
+            },
             "body": {
                 "name": "Cascade Test Store"
             },
@@ -315,6 +372,9 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
                 "id": "$setup_id"
             },
             "query": {},
+            "headers": {
+                "Authorization": "Bearer $fresh_access_token"
+            },
             "body": null
         },
         "expected_status": 200,
