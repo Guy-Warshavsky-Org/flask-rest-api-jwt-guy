@@ -9,7 +9,7 @@ This script supports two modes:
 1. SRC Validation: Tests endpoints and captures responses (no expected_response)
 2. DST Contract Validation: Tests endpoints and validates responses match expected (has expected_response)
 
-Generated at: 2026-03-01T18:44:45.096153+00:00
+Generated at: 2026-03-01T18:51:30.492078+00:00
 Project: flask-rest-api-jwt-guy
 Milestone: 2
 """
@@ -63,13 +63,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
             }
         },
         "expected_status": 201,
-        "cleanup": {
-            "endpoint": "/store/{id}",
-            "method": "DELETE",
-            "path": {
-                "id": "$setup_id"
-            }
-        }
+        "cleanup": null
     },
     {
         "name": "get_store_happy_path",
