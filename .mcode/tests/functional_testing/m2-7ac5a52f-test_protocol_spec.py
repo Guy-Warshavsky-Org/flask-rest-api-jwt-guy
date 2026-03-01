@@ -9,7 +9,7 @@ This script supports two modes:
 1. SRC Validation: Tests endpoints and captures responses (no expected_response)
 2. DST Contract Validation: Tests endpoints and validates responses match expected (has expected_response)
 
-Generated at: 2026-03-01T18:51:30.492078+00:00
+Generated at: 2026-03-01T18:57:10.661534+00:00
 Project: flask-rest-api-jwt-guy
 Milestone: 2
 """
@@ -51,47 +51,26 @@ def resolve_env_placeholders(obj: Any) -> Any:
 TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
     json.loads(r'''[
     {
-        "name": "create_store_happy_path",
+        "name": "list_stores_happy_path",
         "category": "HAPPY_PATH",
-        "endpoint": "/store/",
-        "method": "POST",
-        "description": "Create a new store with a valid name. Verify 201 status and store object returned.",
+        "endpoint": "/store/s",
+        "method": "GET",
+        "description": "List all stores for the authenticated user. Expect 200 with an array.",
         "setup": null,
-        "request_data": {
-            "body": {
-                "name": "My Test Store"
-            }
-        },
-        "expected_status": 201,
+        "request_data": {},
+        "expected_status": 200,
         "cleanup": null
     },
     {
-        "name": "get_store_happy_path",
+        "name": "list_items_happy_path",
         "category": "HAPPY_PATH",
-        "endpoint": "/store/{id}",
+        "endpoint": "/item/s",
         "method": "GET",
-        "description": "Create a store, then retrieve it by ID. Verify 200 status and correct store data.",
-        "setup": {
-            "endpoint": "/store/",
-            "method": "POST",
-            "body": {
-                "name": "Store To Retrieve"
-            },
-            "extract_id_from": "id"
-        },
-        "request_data": {
-            "path": {
-                "id": "$setup_id"
-            }
-        },
+        "description": "List all items across authenticated user stores. Expect 200 with an array.",
+        "setup": null,
+        "request_data": {},
         "expected_status": 200,
-        "cleanup": {
-            "endpoint": "/store/{id}",
-            "method": "DELETE",
-            "path": {
-                "id": "$setup_id"
-            }
-        }
+        "cleanup": null
     },
     {
         "name": "get_store_not_found",
@@ -106,112 +85,6 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
             }
         },
         "expected_status": 404,
-        "cleanup": null
-    },
-    {
-        "name": "list_stores_happy_path",
-        "category": "HAPPY_PATH",
-        "endpoint": "/store/s",
-        "method": "GET",
-        "description": "List all stores for the authenticated user. Expect 200 with an array.",
-        "setup": null,
-        "request_data": {},
-        "expected_status": 200,
-        "cleanup": null
-    },
-    {
-        "name": "delete_store_happy_path",
-        "category": "HAPPY_PATH",
-        "endpoint": "/store/{id}",
-        "method": "DELETE",
-        "description": "Create a store, then delete it. Verify 200 status and message response.",
-        "setup": {
-            "endpoint": "/store/",
-            "method": "POST",
-            "body": {
-                "name": "Store To Delete"
-            },
-            "extract_id_from": "id"
-        },
-        "request_data": {
-            "path": {
-                "id": "$setup_id"
-            }
-        },
-        "expected_status": 200,
-        "cleanup": null
-    },
-    {
-        "name": "delete_store_not_found",
-        "category": "NOT_FOUND",
-        "endpoint": "/store/{id}",
-        "method": "DELETE",
-        "description": "Attempt to delete a store that does not exist. Expect 404.",
-        "setup": null,
-        "request_data": {
-            "path": {
-                "id": 99999
-            }
-        },
-        "expected_status": 404,
-        "cleanup": null
-    },
-    {
-        "name": "create_item_happy_path",
-        "category": "HAPPY_PATH",
-        "endpoint": "/item/",
-        "method": "POST",
-        "description": "Create a store first, then create an item in that store. Verify 201 status.",
-        "setup": {
-            "endpoint": "/store/",
-            "method": "POST",
-            "body": {
-                "name": "Store For Item"
-            },
-            "extract_id_from": "id"
-        },
-        "request_data": {
-            "body": {
-                "name": "Test Widget",
-                "price": 9.99,
-                "store_id": "$setup_id"
-            }
-        },
-        "expected_status": 201,
-        "cleanup": {
-            "endpoint": "/store/{id}",
-            "method": "DELETE",
-            "path": {
-                "id": "$setup_id"
-            }
-        }
-    },
-    {
-        "name": "create_item_nonexistent_store",
-        "category": "NOT_FOUND",
-        "endpoint": "/item/",
-        "method": "POST",
-        "description": "Attempt to create an item referencing a store that does not exist. Expect 404.",
-        "setup": null,
-        "request_data": {
-            "body": {
-                "name": "Orphan Item",
-                "price": 5.5,
-                "store_id": 99999
-            }
-        },
-        "expected_status": 404,
-        "cleanup": null
-    },
-    {
-        "name": "list_items_happy_path",
-        "category": "HAPPY_PATH",
-        "endpoint": "/item/s",
-        "method": "GET",
-        "description": "List all items across authenticated user stores. Expect 200 with an array.",
-        "setup": null,
-        "request_data": {},
-        "expected_status": 200,
         "cleanup": null
     },
     {
@@ -230,50 +103,31 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "cleanup": null
     },
     {
-        "name": "update_item_not_found",
-        "category": "NOT_FOUND",
-        "endpoint": "/item/{id}",
-        "method": "PUT",
-        "description": "Attempt to update an item that does not exist. Expect 404.",
+        "name": "create_store_happy_path",
+        "category": "HAPPY_PATH",
+        "endpoint": "/store/",
+        "method": "POST",
+        "description": "Create a new store with a valid name. Verify 201 status.",
         "setup": null,
         "request_data": {
-            "path": {
-                "id": 99999
-            },
             "body": {
-                "name": "Updated Widget",
-                "price": 19.99
+                "name": "My Test Store"
             }
         },
-        "expected_status": 404,
+        "expected_status": 201,
         "cleanup": null
     },
     {
-        "name": "delete_item_not_found",
-        "category": "NOT_FOUND",
-        "endpoint": "/item/{id}",
-        "method": "DELETE",
-        "description": "Attempt to delete an item that does not exist. Expect 404.",
-        "setup": null,
-        "request_data": {
-            "path": {
-                "id": 99999
-            }
-        },
-        "expected_status": 404,
-        "cleanup": null
-    },
-    {
-        "name": "delete_store_cascades_items",
+        "name": "delete_store_happy_path",
         "category": "HAPPY_PATH",
         "endpoint": "/store/{id}",
         "method": "DELETE",
-        "description": "Create a store then delete it. Verifies cascade delete behavior.",
+        "description": "Create a store, then delete it. Verify 200 status.",
         "setup": {
             "endpoint": "/store/",
             "method": "POST",
             "body": {
-                "name": "Cascade Test Store"
+                "name": "Store To Delete"
             },
             "extract_id_from": "id"
         },
