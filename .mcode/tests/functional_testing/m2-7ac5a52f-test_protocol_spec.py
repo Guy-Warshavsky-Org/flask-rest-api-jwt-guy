@@ -9,7 +9,7 @@ This script supports two modes:
 1. SRC Validation: Tests endpoints and captures responses (no expected_response)
 2. DST Contract Validation: Tests endpoints and validates responses match expected (has expected_response)
 
-Generated at: 2026-03-01T18:30:43.451658+00:00
+Generated at: 2026-03-01T18:34:18.018375+00:00
 Project: flask-rest-api-jwt-guy
 Milestone: 2
 """
@@ -55,14 +55,12 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "category": "HAPPY_PATH",
         "endpoint": "/store/",
         "method": "POST",
-        "description": "Create a new store with a valid name. Verify 201 status and store object returned with id, name, and user_id.",
+        "description": "Create a new store with a valid name. Verify 201 status and store object returned.",
+        "headers": {
+            "Authorization": "Bearer $fresh_access_token"
+        },
         "setup": null,
         "request_data": {
-            "path": {},
-            "query": {},
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
-            },
             "body": {
                 "name": "My Test Store"
             }
@@ -71,9 +69,6 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "cleanup": {
             "endpoint": "/store/{id}",
             "method": "DELETE",
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
-            },
             "path": {
                 "id": "$setup_id"
             }
@@ -84,13 +79,13 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "category": "HAPPY_PATH",
         "endpoint": "/store/{id}",
         "method": "GET",
-        "description": "Create a store, then retrieve it by ID. Verify 200 status and correct store data returned.",
+        "description": "Create a store, then retrieve it by ID. Verify 200 status and correct store data.",
+        "headers": {
+            "Authorization": "Bearer $fresh_access_token"
+        },
         "setup": {
             "endpoint": "/store/",
             "method": "POST",
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
-            },
             "body": {
                 "name": "Store To Retrieve"
             },
@@ -99,20 +94,12 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "request_data": {
             "path": {
                 "id": "$setup_id"
-            },
-            "query": {},
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
-            },
-            "body": null
+            }
         },
         "expected_status": 200,
         "cleanup": {
             "endpoint": "/store/{id}",
             "method": "DELETE",
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
-            },
             "path": {
                 "id": "$setup_id"
             }
@@ -124,16 +111,14 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "endpoint": "/store/{id}",
         "method": "GET",
         "description": "Attempt to retrieve a store that does not exist. Expect 404.",
+        "headers": {
+            "Authorization": "Bearer $fresh_access_token"
+        },
         "setup": null,
         "request_data": {
             "path": {
                 "id": 99999
-            },
-            "query": {},
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
-            },
-            "body": null
+            }
         },
         "expected_status": 404,
         "cleanup": null
@@ -143,16 +128,12 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "category": "HAPPY_PATH",
         "endpoint": "/store/s",
         "method": "GET",
-        "description": "List all stores for the authenticated user. Expect 200 with an array response.",
-        "setup": null,
-        "request_data": {
-            "path": {},
-            "query": {},
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
-            },
-            "body": null
+        "description": "List all stores for the authenticated user. Expect 200 with an array.",
+        "headers": {
+            "Authorization": "Bearer $fresh_access_token"
         },
+        "setup": null,
+        "request_data": {},
         "expected_status": 200,
         "cleanup": null
     },
@@ -161,13 +142,13 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "category": "HAPPY_PATH",
         "endpoint": "/store/{id}",
         "method": "DELETE",
-        "description": "Create a store, then delete it. Verify 200 status and message response returned.",
+        "description": "Create a store, then delete it. Verify 200 status and message response.",
+        "headers": {
+            "Authorization": "Bearer $fresh_access_token"
+        },
         "setup": {
             "endpoint": "/store/",
             "method": "POST",
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
-            },
             "body": {
                 "name": "Store To Delete"
             },
@@ -176,12 +157,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "request_data": {
             "path": {
                 "id": "$setup_id"
-            },
-            "query": {},
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
-            },
-            "body": null
+            }
         },
         "expected_status": 200,
         "cleanup": null
@@ -192,16 +168,14 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "endpoint": "/store/{id}",
         "method": "DELETE",
         "description": "Attempt to delete a store that does not exist. Expect 404.",
+        "headers": {
+            "Authorization": "Bearer $fresh_access_token"
+        },
         "setup": null,
         "request_data": {
             "path": {
                 "id": 99999
-            },
-            "query": {},
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
-            },
-            "body": null
+            }
         },
         "expected_status": 404,
         "cleanup": null
@@ -211,24 +185,19 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "category": "HAPPY_PATH",
         "endpoint": "/item/",
         "method": "POST",
-        "description": "Create a store first, then create an item in that store. Verify 201 status and item object with id, name, price, and store_id.",
+        "description": "Create a store first, then create an item in that store. Verify 201 status.",
+        "headers": {
+            "Authorization": "Bearer $fresh_access_token"
+        },
         "setup": {
             "endpoint": "/store/",
             "method": "POST",
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
-            },
             "body": {
                 "name": "Store For Item"
             },
             "extract_id_from": "id"
         },
         "request_data": {
-            "path": {},
-            "query": {},
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
-            },
             "body": {
                 "name": "Test Widget",
                 "price": 9.99,
@@ -239,9 +208,6 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "cleanup": {
             "endpoint": "/store/{id}",
             "method": "DELETE",
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
-            },
             "path": {
                 "id": "$setup_id"
             }
@@ -253,13 +219,11 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "endpoint": "/item/",
         "method": "POST",
         "description": "Attempt to create an item referencing a store that does not exist. Expect 404.",
+        "headers": {
+            "Authorization": "Bearer $fresh_access_token"
+        },
         "setup": null,
         "request_data": {
-            "path": {},
-            "query": {},
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
-            },
             "body": {
                 "name": "Orphan Item",
                 "price": 5.5,
@@ -274,16 +238,12 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "category": "HAPPY_PATH",
         "endpoint": "/item/s",
         "method": "GET",
-        "description": "List all items across the authenticated user's stores. Expect 200 with an array response.",
-        "setup": null,
-        "request_data": {
-            "path": {},
-            "query": {},
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
-            },
-            "body": null
+        "description": "List all items across authenticated user stores. Expect 200 with an array.",
+        "headers": {
+            "Authorization": "Bearer $fresh_access_token"
         },
+        "setup": null,
+        "request_data": {},
         "expected_status": 200,
         "cleanup": null
     },
@@ -293,16 +253,14 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "endpoint": "/item/{id}",
         "method": "GET",
         "description": "Attempt to retrieve an item that does not exist. Expect 404.",
+        "headers": {
+            "Authorization": "Bearer $fresh_access_token"
+        },
         "setup": null,
         "request_data": {
             "path": {
                 "id": 99999
-            },
-            "query": {},
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
-            },
-            "body": null
+            }
         },
         "expected_status": 404,
         "cleanup": null
@@ -313,14 +271,13 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "endpoint": "/item/{id}",
         "method": "PUT",
         "description": "Attempt to update an item that does not exist. Expect 404.",
+        "headers": {
+            "Authorization": "Bearer $fresh_access_token"
+        },
         "setup": null,
         "request_data": {
             "path": {
                 "id": 99999
-            },
-            "query": {},
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
             },
             "body": {
                 "name": "Updated Widget",
@@ -336,16 +293,14 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "endpoint": "/item/{id}",
         "method": "DELETE",
         "description": "Attempt to delete an item that does not exist. Expect 404.",
+        "headers": {
+            "Authorization": "Bearer $fresh_access_token"
+        },
         "setup": null,
         "request_data": {
             "path": {
                 "id": 99999
-            },
-            "query": {},
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
-            },
-            "body": null
+            }
         },
         "expected_status": 404,
         "cleanup": null
@@ -355,13 +310,13 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "category": "HAPPY_PATH",
         "endpoint": "/store/{id}",
         "method": "DELETE",
-        "description": "Create a store and an item in it, then delete the store. Verifies cascade delete behavior.",
+        "description": "Create a store then delete it. Verifies cascade delete behavior.",
+        "headers": {
+            "Authorization": "Bearer $fresh_access_token"
+        },
         "setup": {
             "endpoint": "/store/",
             "method": "POST",
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
-            },
             "body": {
                 "name": "Cascade Test Store"
             },
@@ -370,12 +325,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "request_data": {
             "path": {
                 "id": "$setup_id"
-            },
-            "query": {},
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
-            },
-            "body": null
+            }
         },
         "expected_status": 200,
         "cleanup": null
