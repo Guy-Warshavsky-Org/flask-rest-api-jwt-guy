@@ -9,7 +9,7 @@ This script supports two modes:
 1. SRC Validation: Tests endpoints and captures responses (no expected_response)
 2. DST Contract Validation: Tests endpoints and validates responses match expected (has expected_response)
 
-Generated at: 2026-03-01T18:16:59.567969+00:00
+Generated at: 2026-03-01T18:20:04.470910+00:00
 Project: flask-rest-api-jwt-guy
 Milestone: 1
 """
