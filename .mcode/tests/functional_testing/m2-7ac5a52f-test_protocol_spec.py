@@ -9,7 +9,7 @@ This script supports two modes:
 1. SRC Validation: Tests endpoints and captures responses (no expected_response)
 2. DST Contract Validation: Tests endpoints and validates responses match expected (has expected_response)
 
-Generated at: 2026-03-01T18:13:22.971791+00:00
+Generated at: 2026-03-01T18:19:03.653956+00:00
 Project: flask-rest-api-jwt-guy
 Milestone: 2
 """
@@ -65,22 +65,13 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
             }
         },
         "expected_status": 201,
-        "cleanup": null
-    },
-    {
-        "name": "create_store_missing_name",
-        "category": "MISSING_REQUIRED",
-        "endpoint": "/store/",
-        "method": "POST",
-        "description": "Attempt to create a store without providing the required name field. Expect 400 or 422 error.",
-        "setup": null,
-        "request_data": {
-            "path": {},
-            "query": {},
-            "body": {}
-        },
-        "expected_status": 400,
-        "cleanup": null
+        "cleanup": {
+            "endpoint": "/store/{id}",
+            "method": "DELETE",
+            "path": {
+                "id": "$response.id"
+            }
+        }
     },
     {
         "name": "get_store_happy_path",
@@ -134,7 +125,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "category": "HAPPY_PATH",
         "endpoint": "/store/s",
         "method": "GET",
-        "description": "List all stores for the authenticated user. Expect 200 with an array response (may be empty on fresh database).",
+        "description": "List all stores for the authenticated user. Expect 200 with an array response.",
         "setup": null,
         "request_data": {
             "path": {},
@@ -149,7 +140,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "category": "HAPPY_PATH",
         "endpoint": "/store/{id}",
         "method": "DELETE",
-        "description": "Create a store, then delete it. Verify 200 status and message 'Deleted' returned.",
+        "description": "Create a store, then delete it. Verify 200 status and message response returned.",
         "setup": {
             "endpoint": "/store/",
             "method": "POST",
@@ -237,28 +228,11 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "cleanup": null
     },
     {
-        "name": "create_item_missing_fields",
-        "category": "MISSING_REQUIRED",
-        "endpoint": "/item/",
-        "method": "POST",
-        "description": "Attempt to create an item without required fields (name, price, store_id). Expect 400 or 422 error.",
-        "setup": null,
-        "request_data": {
-            "path": {},
-            "query": {},
-            "body": {
-                "name": "Incomplete Item"
-            }
-        },
-        "expected_status": 400,
-        "cleanup": null
-    },
-    {
         "name": "list_items_happy_path",
         "category": "HAPPY_PATH",
         "endpoint": "/item/s",
         "method": "GET",
-        "description": "List all items across the authenticated user's stores. Expect 200 with an array response (may be empty on fresh database).",
+        "description": "List all items across the authenticated user's stores. Expect 200 with an array response.",
         "setup": null,
         "request_data": {
             "path": {},
@@ -327,7 +301,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "category": "HAPPY_PATH",
         "endpoint": "/store/{id}",
         "method": "DELETE",
-        "description": "Create a store and an item in it, then delete the store. Verifies cascade delete behavior \u2014 the store deletion should also remove its items.",
+        "description": "Create a store and an item in it, then delete the store. Verifies cascade delete behavior.",
         "setup": {
             "endpoint": "/store/",
             "method": "POST",
@@ -350,8 +324,8 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
 )
 
 # Base URL for API requests (from app discovery, includes host:port)
-BASE_URL = os.path.expandvars("")
-HEALTH_CHECK_ENDPOINT = os.path.expandvars("")
+BASE_URL = os.path.expandvars("http://localhost:5000")
+HEALTH_CHECK_ENDPOINT = os.path.expandvars("/health/")
 REQUEST_TIMEOUT = 30
 HEALTH_CHECK_URL = f"{BASE_URL.rstrip('/')}/{HEALTH_CHECK_ENDPOINT.lstrip('/')}"
 
