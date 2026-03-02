@@ -228,7 +228,9 @@ func (h *ItemHandler) UpdateItem(c *gin.Context) {
 		item.StoreID = *req.StoreID
 	}
 
-	if err := h.DB.Save(&item).Error; err != nil {
+	// Use Select to save only the item's own columns, avoiding GORM's association
+	// auto-save which would interfere with the preloaded Store relationship.
+	if err := h.DB.Select("Name", "Price", "StoreID").Save(&item).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to update item"})
 		return
 	}
