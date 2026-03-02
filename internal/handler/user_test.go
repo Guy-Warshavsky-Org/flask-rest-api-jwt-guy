@@ -97,6 +97,12 @@ func parseJSON(t *testing.T, w *httptest.ResponseRecorder) map[string]interface{
 	return result
 }
 
+// parseJSONArray parses the response body into a slice of maps.
+func parseJSONArray(t *testing.T, w *httptest.ResponseRecorder, out *[]map[string]interface{}) error {
+	t.Helper()
+	return json.Unmarshal(w.Body.Bytes(), out)
+}
+
 // getUserID extracts the user ID from a response body as an integer string.
 func getUserID(t *testing.T, w *httptest.ResponseRecorder) string {
 	t.Helper()
