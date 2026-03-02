@@ -85,6 +85,13 @@ replay_pid*
 *.test
 *.out
 *.coverprofile
+/server
+/cmd/server/server
+
+# SQLite dev databases
+*.sqlite
+*.db
+data-dev.sqlite
 
 # ----- C# / .NET -----
 [Bb]in/
