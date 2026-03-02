@@ -18,7 +18,7 @@ type Config struct {
 	AppEnv string `env:"APP_ENV" envDefault:"development"`
 
 	// Port the HTTP server listens on.
-	Port string `env:"PORT" envDefault:"5000"`
+	Port string `env:"PORT" envDefault:"8080"`
 
 	// DatabaseURL is the connection string.
 	// Development default: SQLite file. Production default: PostgreSQL DSN.
