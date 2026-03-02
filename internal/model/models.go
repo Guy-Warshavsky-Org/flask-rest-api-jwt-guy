@@ -55,6 +55,9 @@ type Item struct {
 	Name    string  `gorm:"size:64;not null" json:"name"`
 	Price   float64 `gorm:"not null" json:"price"`
 	StoreID int     `gorm:"not null;index" json:"store_id"`
+	// Store is the belongs-to relationship used for ownership checks via Preload("Store").
+	// Excluded from JSON since Flask's ItemSchema only includes the foreign key, not the nested store.
+	Store Store `gorm:"foreignKey:StoreID" json:"-"`
 }
 
 // AutoMigrateAll runs GORM auto-migration for all models.
