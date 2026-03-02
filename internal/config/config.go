@@ -78,6 +78,12 @@ func OpenDB(cfg *Config) (*gorm.DB, error) {
 		return nil, fmt.Errorf("failed to connect to database: %w", err)
 	}
 
+	// SQLite does not enforce foreign key constraints by default.
+	// Enable them so ON DELETE CASCADE rules work correctly.
+	if !isPostgres(cfg.DatabaseURL) {
+		db.Exec("PRAGMA foreign_keys = ON")
+	}
+
 	return db, nil
 }
 
