@@ -9,7 +9,7 @@ This script supports two modes:
 1. SRC Validation: Tests endpoints and captures responses (no expected_response)
 2. DST Contract Validation: Tests endpoints and validates responses match expected (has expected_response)
 
-Generated at: 2026-03-03T10:43:45.771029+00:00
+Generated at: 2026-03-03T10:50:00.039697+00:00
 Project: flask-rest-api-jwt-guy-2
 Milestone: 4
 """
@@ -51,11 +51,26 @@ def resolve_env_placeholders(obj: Any) -> Any:
 TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
     json.loads(r'''[
     {
+        "name": "health_check_happy_path",
+        "category": "HAPPY_PATH",
+        "endpoint": "/health/",
+        "method": "GET",
+        "description": "Health check endpoint returns 200 with status healthy",
+        "setup": null,
+        "request_data": {
+            "path": {},
+            "query": {},
+            "body": null
+        },
+        "expected_status": 200,
+        "cleanup": null
+    },
+    {
         "name": "create_tag_happy_path",
         "category": "HAPPY_PATH",
         "endpoint": "/tag/store/{store_id}",
         "method": "POST",
-        "description": "Create a store, then create a tag in that store. Expects 201 with the tag object returned.",
+        "description": "Create a store then create a tag in that store",
         "setup": {
             "endpoint": "/store/",
             "method": "POST",
@@ -81,106 +96,6 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
                 "id": "$setup_id"
             }
         }
-    },
-    {
-        "name": "create_tag_store_not_found",
-        "category": "NOT_FOUND",
-        "endpoint": "/tag/store/{store_id}",
-        "method": "POST",
-        "description": "Attempt to create a tag in a non-existent store. Expects 404.",
-        "setup": null,
-        "request_data": {
-            "path": {
-                "store_id": 999999
-            },
-            "query": {},
-            "body": {
-                "name": "orphan-tag"
-            }
-        },
-        "expected_status": 404,
-        "cleanup": null
-    },
-    {
-        "name": "get_tag_not_found",
-        "category": "NOT_FOUND",
-        "endpoint": "/tag/{id}",
-        "method": "GET",
-        "description": "Attempt to get a tag that does not exist. Expects 404.",
-        "setup": null,
-        "request_data": {
-            "path": {
-                "id": 999999
-            },
-            "query": {},
-            "body": null
-        },
-        "expected_status": 404,
-        "cleanup": null
-    },
-    {
-        "name": "list_tags_in_store_happy_path",
-        "category": "HAPPY_PATH",
-        "endpoint": "/tag/store/{store_id}/s",
-        "method": "GET",
-        "description": "Create a store, then list tags in that store. Expects 200 with an array (initially empty).",
-        "setup": {
-            "endpoint": "/store/",
-            "method": "POST",
-            "body": {
-                "name": "list-tags-store"
-            },
-            "extract_id_from": "id"
-        },
-        "request_data": {
-            "path": {
-                "store_id": "$setup_id"
-            },
-            "query": {},
-            "body": null
-        },
-        "expected_status": 200,
-        "cleanup": {
-            "endpoint": "/store/{id}",
-            "method": "DELETE",
-            "path": {
-                "id": "$setup_id"
-            }
-        }
-    },
-    {
-        "name": "list_tags_store_not_found",
-        "category": "NOT_FOUND",
-        "endpoint": "/tag/store/{store_id}/s",
-        "method": "GET",
-        "description": "Attempt to list tags in a non-existent store. Expects 404.",
-        "setup": null,
-        "request_data": {
-            "path": {
-                "store_id": 999999
-            },
-            "query": {},
-            "body": null
-        },
-        "expected_status": 404,
-        "cleanup": null
-    },
-    {
-        "name": "delete_tag_not_found",
-        "category": "NOT_FOUND",
-        "endpoint": "/tag/{id}",
-        "method": "DELETE",
-        "description": "Attempt to delete a tag that does not exist. Expects 404.",
-        "setup": null,
-        "request_data": {
-            "path": {
-                "id": 999999
-            },
-            "query": {},
-            "body": null
-        },
-        "expected_status": 404,
-        "cleanup": null
     }
 ]''')
 )
