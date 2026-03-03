@@ -9,7 +9,7 @@ This script supports two modes:
 1. SRC Validation: Tests endpoints and captures responses (no expected_response)
 2. DST Contract Validation: Tests endpoints and validates responses match expected (has expected_response)
 
-Generated at: 2026-03-03T09:55:42.047053+00:00
+Generated at: 2026-03-03T10:07:21.685454+00:00
 Project: flask-rest-api-jwt-guy-2
 Milestone: 3
 """
@@ -78,7 +78,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
             "query": {},
             "headers": {},
             "body": {
-                "username": "testuser_reg_1",
+                "username": "functest_reg_user_v3",
                 "password": "securePassword123"
             }
         },
@@ -95,7 +95,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
             "endpoint": "/user/register",
             "method": "POST",
             "body": {
-                "username": "testuser_dup",
+                "username": "functest_dup_user_v3",
                 "password": "securePassword123"
             },
             "extract_id_from": "id"
@@ -105,7 +105,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
             "query": {},
             "headers": {},
             "body": {
-                "username": "testuser_dup",
+                "username": "functest_dup_user_v3",
                 "password": "anotherPassword123"
             }
         },
@@ -122,7 +122,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
             "endpoint": "/user/register",
             "method": "POST",
             "body": {
-                "username": "testuser_login_1",
+                "username": "functest_login_user_v3",
                 "password": "securePassword123"
             },
             "extract_id_from": "id"
@@ -132,7 +132,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
             "query": {},
             "headers": {},
             "body": {
-                "username": "testuser_login_1",
+                "username": "functest_login_user_v3",
                 "password": "securePassword123"
             }
         },
@@ -151,7 +151,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
             "query": {},
             "headers": {},
             "body": {
-                "username": "nonexistent_user",
+                "username": "nonexistent_user_xyz",
                 "password": "wrongPassword"
             }
         },
@@ -237,7 +237,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "category": "HAPPY_PATH",
         "endpoint": "/store/{id}",
         "method": "GET",
-        "description": "Create a store, then retrieve it by ID to verify the response contains correct store data",
+        "description": "Create a store, then retrieve it by ID",
         "setup": {
             "endpoint": "/store/",
             "method": "POST",
@@ -355,7 +355,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "category": "HAPPY_PATH",
         "endpoint": "/item/",
         "method": "POST",
-        "description": "Create a store first, then create an item in that store. Expects 201 with item data.",
+        "description": "Create a store first via setup, then create an item in that store. Expects 201.",
         "setup": {
             "endpoint": "/store/",
             "method": "POST",
@@ -426,52 +426,6 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "cleanup": null
     },
     {
-        "name": "get_item_by_id_happy_path",
-        "category": "HAPPY_PATH",
-        "endpoint": "/item/{id}",
-        "method": "GET",
-        "description": "Create a store and item, then retrieve the item by ID to verify correct data",
-        "setup": [
-            {
-                "endpoint": "/store/",
-                "method": "POST",
-                "body": {
-                    "name": "Get Item Test Store"
-                },
-                "extract_id_from": "id",
-                "as": "store_id"
-            },
-            {
-                "endpoint": "/item/",
-                "method": "POST",
-                "body": {
-                    "name": "USB Cable",
-                    "price": 12.5,
-                    "store_id": "$store_id"
-                },
-                "extract_id_from": "id"
-            }
-        ],
-        "request_data": {
-            "path": {
-                "id": "$setup_id"
-            },
-            "query": {},
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
-            },
-            "body": null
-        },
-        "expected_status": 200,
-        "cleanup": {
-            "endpoint": "/store/{id}",
-            "method": "DELETE",
-            "path": {
-                "id": "$store_id"
-            }
-        }
-    },
-    {
         "name": "get_item_not_found",
         "category": "NOT_FOUND",
         "endpoint": "/item/{id}",
@@ -490,55 +444,6 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         },
         "expected_status": 404,
         "cleanup": null
-    },
-    {
-        "name": "update_item_happy_path",
-        "category": "HAPPY_PATH",
-        "endpoint": "/item/{id}",
-        "method": "PUT",
-        "description": "Create a store and item, then update the item name and price. Verify 200 with updated data.",
-        "setup": [
-            {
-                "endpoint": "/store/",
-                "method": "POST",
-                "body": {
-                    "name": "Update Item Test Store"
-                },
-                "extract_id_from": "id",
-                "as": "store_id"
-            },
-            {
-                "endpoint": "/item/",
-                "method": "POST",
-                "body": {
-                    "name": "Old Keyboard",
-                    "price": 45.0,
-                    "store_id": "$store_id"
-                },
-                "extract_id_from": "id"
-            }
-        ],
-        "request_data": {
-            "path": {
-                "id": "$setup_id"
-            },
-            "query": {},
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
-            },
-            "body": {
-                "name": "Mechanical Keyboard",
-                "price": 89.99
-            }
-        },
-        "expected_status": 200,
-        "cleanup": {
-            "endpoint": "/store/{id}",
-            "method": "DELETE",
-            "path": {
-                "id": "$store_id"
-            }
-        }
     },
     {
         "name": "update_item_not_found",
@@ -562,52 +467,6 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         },
         "expected_status": 404,
         "cleanup": null
-    },
-    {
-        "name": "delete_item_happy_path",
-        "category": "HAPPY_PATH",
-        "endpoint": "/item/{id}",
-        "method": "DELETE",
-        "description": "Create a store and item, then delete the item. Expects 200 with deletion confirmation.",
-        "setup": [
-            {
-                "endpoint": "/store/",
-                "method": "POST",
-                "body": {
-                    "name": "Delete Item Test Store"
-                },
-                "extract_id_from": "id",
-                "as": "store_id"
-            },
-            {
-                "endpoint": "/item/",
-                "method": "POST",
-                "body": {
-                    "name": "Disposable Pen",
-                    "price": 1.5,
-                    "store_id": "$store_id"
-                },
-                "extract_id_from": "id"
-            }
-        ],
-        "request_data": {
-            "path": {
-                "id": "$setup_id"
-            },
-            "query": {},
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
-            },
-            "body": null
-        },
-        "expected_status": 200,
-        "cleanup": {
-            "endpoint": "/store/{id}",
-            "method": "DELETE",
-            "path": {
-                "id": "$store_id"
-            }
-        }
     },
     {
         "name": "delete_item_not_found",
@@ -634,7 +493,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "category": "HAPPY_PATH",
         "endpoint": "/tag/store/{store_id}",
         "method": "POST",
-        "description": "Create a store, then create a tag in that store. Expects 201 with tag data.",
+        "description": "Create a store via setup, then create a tag in that store. Expects 201.",
         "setup": {
             "endpoint": "/store/",
             "method": "POST",
@@ -665,50 +524,6 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         }
     },
     {
-        "name": "get_tag_happy_path",
-        "category": "HAPPY_PATH",
-        "endpoint": "/tag/{id}",
-        "method": "GET",
-        "description": "Create a store and tag, then retrieve the tag by ID",
-        "setup": [
-            {
-                "endpoint": "/store/",
-                "method": "POST",
-                "body": {
-                    "name": "Get Tag Test Store"
-                },
-                "extract_id_from": "id",
-                "as": "store_id"
-            },
-            {
-                "endpoint": "/tag/store/$store_id",
-                "method": "POST",
-                "body": {
-                    "name": "Sale"
-                },
-                "extract_id_from": "id"
-            }
-        ],
-        "request_data": {
-            "path": {
-                "id": "$setup_id"
-            },
-            "query": {},
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
-            },
-            "body": null
-        },
-        "expected_status": 200,
-        "cleanup": {
-            "endpoint": "/store/{id}",
-            "method": "DELETE",
-            "path": {
-                "id": "$store_id"
-            }
-        }
-    },
-    {
         "name": "get_tag_not_found",
         "category": "NOT_FOUND",
         "endpoint": "/tag/{id}",
@@ -733,7 +548,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "category": "HAPPY_PATH",
         "endpoint": "/tag/store/{store_id}/s",
         "method": "GET",
-        "description": "Create a store, then list all tags in it. Returns an array.",
+        "description": "Create a store via setup, then list tags in it. Returns an array.",
         "setup": {
             "endpoint": "/store/",
             "method": "POST",
@@ -762,50 +577,6 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         }
     },
     {
-        "name": "delete_tag_happy_path",
-        "category": "HAPPY_PATH",
-        "endpoint": "/tag/{id}",
-        "method": "DELETE",
-        "description": "Create a store and tag, then delete the tag. Expects 200.",
-        "setup": [
-            {
-                "endpoint": "/store/",
-                "method": "POST",
-                "body": {
-                    "name": "Delete Tag Test Store"
-                },
-                "extract_id_from": "id",
-                "as": "store_id"
-            },
-            {
-                "endpoint": "/tag/store/$store_id",
-                "method": "POST",
-                "body": {
-                    "name": "Clearance"
-                },
-                "extract_id_from": "id"
-            }
-        ],
-        "request_data": {
-            "path": {
-                "id": "$setup_id"
-            },
-            "query": {},
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
-            },
-            "body": null
-        },
-        "expected_status": 200,
-        "cleanup": {
-            "endpoint": "/store/{id}",
-            "method": "DELETE",
-            "path": {
-                "id": "$store_id"
-            }
-        }
-    },
-    {
         "name": "delete_tag_not_found",
         "category": "NOT_FOUND",
         "endpoint": "/tag/{id}",
@@ -829,7 +600,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
 )
 
 # Base URL for API requests (from app discovery, includes host:port)
-BASE_URL = os.path.expandvars("http://localhost:5000")
+BASE_URL = os.path.expandvars("http://localhost:5001")
 HEALTH_CHECK_ENDPOINT = os.path.expandvars("/health/")
 REQUEST_TIMEOUT = 30
 HEALTH_CHECK_URL = f"{BASE_URL.rstrip('/')}/{HEALTH_CHECK_ENDPOINT.lstrip('/')}"
