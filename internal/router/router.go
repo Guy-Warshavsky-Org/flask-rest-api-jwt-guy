@@ -25,9 +25,9 @@ func SetupRouter(cfg *config.Config) *gin.Engine {
 	handler.RegisterHealthRoutes(base)
 	handler.RegisterUserRoutes(base, cfg)
 	handler.RegisterStoreRoutes(base, cfg)
+	handler.RegisterItemRoutes(base, cfg)
 
 	// Future milestones will register additional route groups here:
-	// handler.RegisterItemRoutes(base)
 	// handler.RegisterTagRoutes(base)
 
 	return engine
