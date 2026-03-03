@@ -9,7 +9,7 @@ This script supports two modes:
 1. SRC Validation: Tests endpoints and captures responses (no expected_response)
 2. DST Contract Validation: Tests endpoints and validates responses match expected (has expected_response)
 
-Generated at: 2026-03-03T09:46:02.596082+00:00
+Generated at: 2026-03-03T09:55:42.047053+00:00
 Project: flask-rest-api-jwt-guy-2
 Milestone: 3
 """
@@ -51,6 +51,150 @@ def resolve_env_placeholders(obj: Any) -> Any:
 TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
     json.loads(r'''[
     {
+        "name": "health_check_happy_path",
+        "category": "HAPPY_PATH",
+        "endpoint": "/health/",
+        "method": "GET",
+        "description": "Health check endpoint should return healthy status when database is reachable",
+        "setup": null,
+        "request_data": {
+            "path": {},
+            "query": {},
+            "headers": {},
+            "body": null
+        },
+        "expected_status": 200,
+        "cleanup": null
+    },
+    {
+        "name": "register_user_happy_path",
+        "category": "HAPPY_PATH",
+        "endpoint": "/user/register",
+        "method": "POST",
+        "description": "Register a new user with valid username and password",
+        "setup": null,
+        "request_data": {
+            "path": {},
+            "query": {},
+            "headers": {},
+            "body": {
+                "username": "testuser_reg_1",
+                "password": "securePassword123"
+            }
+        },
+        "expected_status": 201,
+        "cleanup": null
+    },
+    {
+        "name": "register_user_duplicate",
+        "category": "INVALID_INPUT",
+        "endpoint": "/user/register",
+        "method": "POST",
+        "description": "Attempt to register with a username that already exists, expecting 400",
+        "setup": {
+            "endpoint": "/user/register",
+            "method": "POST",
+            "body": {
+                "username": "testuser_dup",
+                "password": "securePassword123"
+            },
+            "extract_id_from": "id"
+        },
+        "request_data": {
+            "path": {},
+            "query": {},
+            "headers": {},
+            "body": {
+                "username": "testuser_dup",
+                "password": "anotherPassword123"
+            }
+        },
+        "expected_status": 400,
+        "cleanup": null
+    },
+    {
+        "name": "login_user_happy_path",
+        "category": "HAPPY_PATH",
+        "endpoint": "/user/login",
+        "method": "POST",
+        "description": "Login with valid credentials and receive access and refresh tokens",
+        "setup": {
+            "endpoint": "/user/register",
+            "method": "POST",
+            "body": {
+                "username": "testuser_login_1",
+                "password": "securePassword123"
+            },
+            "extract_id_from": "id"
+        },
+        "request_data": {
+            "path": {},
+            "query": {},
+            "headers": {},
+            "body": {
+                "username": "testuser_login_1",
+                "password": "securePassword123"
+            }
+        },
+        "expected_status": 200,
+        "cleanup": null
+    },
+    {
+        "name": "login_user_invalid_credentials",
+        "category": "INVALID_INPUT",
+        "endpoint": "/user/login",
+        "method": "POST",
+        "description": "Attempt login with invalid credentials, expecting 401",
+        "setup": null,
+        "request_data": {
+            "path": {},
+            "query": {},
+            "headers": {},
+            "body": {
+                "username": "nonexistent_user",
+                "password": "wrongPassword"
+            }
+        },
+        "expected_status": 401,
+        "cleanup": null
+    },
+    {
+        "name": "logout_user_happy_path",
+        "category": "HAPPY_PATH",
+        "endpoint": "/user/logout",
+        "method": "POST",
+        "description": "Logout the authenticated user by blacklisting their token",
+        "setup": null,
+        "request_data": {
+            "path": {},
+            "query": {},
+            "headers": {
+                "Authorization": "Bearer $fresh_access_token"
+            },
+            "body": null
+        },
+        "expected_status": 200,
+        "cleanup": null
+    },
+    {
+        "name": "refresh_token_happy_path",
+        "category": "HAPPY_PATH",
+        "endpoint": "/user/refresh",
+        "method": "POST",
+        "description": "Refresh the access token using a valid refresh token",
+        "setup": null,
+        "request_data": {
+            "path": {},
+            "query": {},
+            "headers": {
+                "Authorization": "Bearer $fresh_refresh_token"
+            },
+            "body": null
+        },
+        "expected_status": 200,
+        "cleanup": null
+    },
+    {
         "name": "create_store_happy_path",
         "category": "HAPPY_PATH",
         "endpoint": "/store/",
@@ -71,21 +215,21 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "cleanup": null
     },
     {
-        "name": "create_store_missing_name",
-        "category": "MISSING_REQUIRED",
+        "name": "create_store_no_auth",
+        "category": "UNAUTHORIZED",
         "endpoint": "/store/",
         "method": "POST",
-        "description": "Attempt to create a store without the required name field. Flask raises KeyError resulting in 500.",
+        "description": "Attempt to create a store without a JWT token, expecting 401",
         "setup": null,
         "request_data": {
             "path": {},
             "query": {},
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
-            },
-            "body": {}
+            "headers": {},
+            "body": {
+                "name": "Unauthorized Store"
+            }
         },
-        "expected_status": 500,
+        "expected_status": 401,
         "cleanup": null
     },
     {
@@ -146,7 +290,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "category": "HAPPY_PATH",
         "endpoint": "/store/s",
         "method": "GET",
-        "description": "List all stores for the authenticated user. Returns an array (possibly empty on fresh database).",
+        "description": "List all stores for the authenticated user. Returns an array.",
         "setup": null,
         "request_data": {
             "path": {},
@@ -158,37 +302,6 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         },
         "expected_status": 200,
         "cleanup": null
-    },
-    {
-        "name": "list_stores_after_creation",
-        "category": "HAPPY_PATH",
-        "endpoint": "/store/s",
-        "method": "GET",
-        "description": "Create a store, then list all stores to verify the created store appears in the list",
-        "setup": {
-            "endpoint": "/store/",
-            "method": "POST",
-            "body": {
-                "name": "Book Haven"
-            },
-            "extract_id_from": "id"
-        },
-        "request_data": {
-            "path": {},
-            "query": {},
-            "headers": {
-                "Authorization": "Bearer $fresh_access_token"
-            },
-            "body": null
-        },
-        "expected_status": 200,
-        "cleanup": {
-            "endpoint": "/store/{id}",
-            "method": "DELETE",
-            "path": {
-                "id": "$setup_id"
-            }
-        }
     },
     {
         "name": "delete_store_happy_path",
@@ -515,13 +628,209 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         },
         "expected_status": 404,
         "cleanup": null
+    },
+    {
+        "name": "create_tag_happy_path",
+        "category": "HAPPY_PATH",
+        "endpoint": "/tag/store/{store_id}",
+        "method": "POST",
+        "description": "Create a store, then create a tag in that store. Expects 201 with tag data.",
+        "setup": {
+            "endpoint": "/store/",
+            "method": "POST",
+            "body": {
+                "name": "Tag Test Store"
+            },
+            "extract_id_from": "id"
+        },
+        "request_data": {
+            "path": {
+                "store_id": "$setup_id"
+            },
+            "query": {},
+            "headers": {
+                "Authorization": "Bearer $fresh_access_token"
+            },
+            "body": {
+                "name": "Electronics"
+            }
+        },
+        "expected_status": 201,
+        "cleanup": {
+            "endpoint": "/store/{id}",
+            "method": "DELETE",
+            "path": {
+                "id": "$setup_id"
+            }
+        }
+    },
+    {
+        "name": "get_tag_happy_path",
+        "category": "HAPPY_PATH",
+        "endpoint": "/tag/{id}",
+        "method": "GET",
+        "description": "Create a store and tag, then retrieve the tag by ID",
+        "setup": [
+            {
+                "endpoint": "/store/",
+                "method": "POST",
+                "body": {
+                    "name": "Get Tag Test Store"
+                },
+                "extract_id_from": "id",
+                "as": "store_id"
+            },
+            {
+                "endpoint": "/tag/store/$store_id",
+                "method": "POST",
+                "body": {
+                    "name": "Sale"
+                },
+                "extract_id_from": "id"
+            }
+        ],
+        "request_data": {
+            "path": {
+                "id": "$setup_id"
+            },
+            "query": {},
+            "headers": {
+                "Authorization": "Bearer $fresh_access_token"
+            },
+            "body": null
+        },
+        "expected_status": 200,
+        "cleanup": {
+            "endpoint": "/store/{id}",
+            "method": "DELETE",
+            "path": {
+                "id": "$store_id"
+            }
+        }
+    },
+    {
+        "name": "get_tag_not_found",
+        "category": "NOT_FOUND",
+        "endpoint": "/tag/{id}",
+        "method": "GET",
+        "description": "Attempt to retrieve a tag with a non-existent ID, expecting 404",
+        "setup": null,
+        "request_data": {
+            "path": {
+                "id": 999999
+            },
+            "query": {},
+            "headers": {
+                "Authorization": "Bearer $fresh_access_token"
+            },
+            "body": null
+        },
+        "expected_status": 404,
+        "cleanup": null
+    },
+    {
+        "name": "list_tags_in_store_happy_path",
+        "category": "HAPPY_PATH",
+        "endpoint": "/tag/store/{store_id}/s",
+        "method": "GET",
+        "description": "Create a store, then list all tags in it. Returns an array.",
+        "setup": {
+            "endpoint": "/store/",
+            "method": "POST",
+            "body": {
+                "name": "List Tags Test Store"
+            },
+            "extract_id_from": "id"
+        },
+        "request_data": {
+            "path": {
+                "store_id": "$setup_id"
+            },
+            "query": {},
+            "headers": {
+                "Authorization": "Bearer $fresh_access_token"
+            },
+            "body": null
+        },
+        "expected_status": 200,
+        "cleanup": {
+            "endpoint": "/store/{id}",
+            "method": "DELETE",
+            "path": {
+                "id": "$setup_id"
+            }
+        }
+    },
+    {
+        "name": "delete_tag_happy_path",
+        "category": "HAPPY_PATH",
+        "endpoint": "/tag/{id}",
+        "method": "DELETE",
+        "description": "Create a store and tag, then delete the tag. Expects 200.",
+        "setup": [
+            {
+                "endpoint": "/store/",
+                "method": "POST",
+                "body": {
+                    "name": "Delete Tag Test Store"
+                },
+                "extract_id_from": "id",
+                "as": "store_id"
+            },
+            {
+                "endpoint": "/tag/store/$store_id",
+                "method": "POST",
+                "body": {
+                    "name": "Clearance"
+                },
+                "extract_id_from": "id"
+            }
+        ],
+        "request_data": {
+            "path": {
+                "id": "$setup_id"
+            },
+            "query": {},
+            "headers": {
+                "Authorization": "Bearer $fresh_access_token"
+            },
+            "body": null
+        },
+        "expected_status": 200,
+        "cleanup": {
+            "endpoint": "/store/{id}",
+            "method": "DELETE",
+            "path": {
+                "id": "$store_id"
+            }
+        }
+    },
+    {
+        "name": "delete_tag_not_found",
+        "category": "NOT_FOUND",
+        "endpoint": "/tag/{id}",
+        "method": "DELETE",
+        "description": "Attempt to delete a tag with a non-existent ID, expecting 404",
+        "setup": null,
+        "request_data": {
+            "path": {
+                "id": 999999
+            },
+            "query": {},
+            "headers": {
+                "Authorization": "Bearer $fresh_access_token"
+            },
+            "body": null
+        },
+        "expected_status": 404,
+        "cleanup": null
     }
 ]''')
 )
 
 # Base URL for API requests (from app discovery, includes host:port)
-BASE_URL = os.path.expandvars("")
-HEALTH_CHECK_ENDPOINT = os.path.expandvars("")
+BASE_URL = os.path.expandvars("http://localhost:5000")
+HEALTH_CHECK_ENDPOINT = os.path.expandvars("/health/")
 REQUEST_TIMEOUT = 30
 HEALTH_CHECK_URL = f"{BASE_URL.rstrip('/')}/{HEALTH_CHECK_ENDPOINT.lstrip('/')}"
 # Per-endpoint routing table for microservices DST
