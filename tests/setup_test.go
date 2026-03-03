@@ -105,3 +105,40 @@ func loginUser(r *gin.Engine, username, password string) (int, map[string]interf
 	}))
 	return w.Code, parseJSON(w)
 }
+
+// parseJSONArray parses the response body into a slice of maps (for list endpoints).
+func parseJSONArray(w *httptest.ResponseRecorder) []map[string]interface{} {
+	var body []map[string]interface{}
+	json.Unmarshal(w.Body.Bytes(), &body)
+	return body
+}
+
+// registerAndLogin is a helper that registers a user, logs in, and returns
+// the access token and user ID. Panics on failure.
+func registerAndLogin(r *gin.Engine, username, password string) (string, float64) {
+	_, regBody := registerUser(r, username, password)
+	userID := regBody["id"].(float64)
+
+	_, loginBody := loginUser(r, username, password)
+	accessToken := loginBody["access_token"].(string)
+
+	return accessToken, userID
+}
+
+// createStore is a helper that creates a store and returns the status code and response body.
+func createStore(r *gin.Engine, name string, token string) (int, map[string]interface{}) {
+	w := performRequest(r, "POST", "/store/", jsonBody(map[string]interface{}{
+		"name": name,
+	}), authHeader(token))
+	return w.Code, parseJSON(w)
+}
+
+// createItem is a helper that creates an item and returns the status code and response body.
+func createItem(r *gin.Engine, name string, price float64, storeID int, token string) (int, map[string]interface{}) {
+	w := performRequest(r, "POST", "/item/", jsonBody(map[string]interface{}{
+		"name":     name,
+		"price":    price,
+		"store_id": storeID,
+	}), authHeader(token))
+	return w.Code, parseJSON(w)
+}
