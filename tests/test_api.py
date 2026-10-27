@@ -159,6 +159,22 @@ def test_item_crud(client, alice, bob):
     assert client.get("/item/1", headers=ah).status_code == 404
 
 
+def test_item_update_explicit_null_rejected(client, alice):
+    _, _, ah = alice
+    client.post("/store/", json={"name": "S"}, headers=ah)
+    client.post("/item/", json={"name": "i", "price": 2.5, "store_id": 1}, headers=ah)
+    for field in ("name", "price", "store_id"):
+        assert client.put("/item/1", json={field: None}, headers=ah).status_code == 422
+    assert client.get("/item/1", headers=ah).json() == {"id": 1, "name": "i", "price": 2.5, "store_id": 1}
+    assert client.put("/item/1", json={}, headers=ah).status_code == 200
+
+
+def test_wrong_type_revoked_token_returns_422(client, alice):
+    _, t, ah = alice
+    client.post("/user/logout", headers=ah)
+    assert client.post("/user/refresh", headers=ah).status_code == 422
+
+
 # ---- cascades
 def test_cascade_delete_store_and_user(client, alice):
     uid, _, ah = alice

@@ -1,4 +1,4 @@
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, model_validator
 
 
 class _Out(BaseModel):
@@ -54,3 +54,10 @@ class ItemUpdate(BaseModel):
     name: str | None = None
     price: float | None = None
     store_id: int | None = None
+
+    @model_validator(mode="after")
+    def _reject_explicit_null(self):
+        for field in self.model_fields_set:
+            if getattr(self, field) is None:
+                raise ValueError(f"{field} must not be null")
+        return self

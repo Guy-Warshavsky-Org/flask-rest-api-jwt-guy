@@ -2,20 +2,11 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from ..deps import TokenData, get_current_token, get_db, unauthorized
+from ..deps import TokenData, get_current_token, get_db, get_own_store, unauthorized
 from ..models import Item, Store
 from ..schemas import ItemIn, ItemOut, ItemUpdate
 
 router = APIRouter(prefix="/item")
-
-
-def _get_own_store(store_id: int, token: TokenData, db: Session) -> Store:
-    store = db.get(Store, store_id)
-    if store is None:
-        raise HTTPException(404, "Not Found")
-    if store.user_id != token.user_id:
-        raise unauthorized()
-    return store
 
 
 def _get_own_item(id: int, token: TokenData, db: Session) -> Item:
@@ -29,7 +20,7 @@ def _get_own_item(id: int, token: TokenData, db: Session) -> Item:
 
 @router.post("/", status_code=201, response_model=ItemOut)
 def create_item(data: ItemIn, token: TokenData = Depends(get_current_token), db: Session = Depends(get_db)):
-    _get_own_store(data.store_id, token, db)
+    get_own_store(data.store_id, token, db)
     item = Item(name=data.name, price=data.price, store_id=data.store_id)
     db.add(item)
     db.commit()
@@ -55,7 +46,7 @@ def update_item(id: int, data: ItemUpdate, token: TokenData = Depends(get_curren
     if data.price is not None:
         item.price = data.price
     if data.store_id is not None:
-        _get_own_store(data.store_id, token, db)
+        get_own_store(data.store_id, token, db)
         item.store_id = data.store_id
     db.commit()
     return item

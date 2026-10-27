@@ -9,6 +9,7 @@ from sqlalchemy.orm import Session
 from .core import blocklist
 from .core.database import SessionLocal
 from .core.security import decode_token
+from .models import Store
 
 _bearer = HTTPBearer(auto_error=False)
 
@@ -41,10 +42,10 @@ def _authenticate(creds: HTTPAuthorizationCredentials | None, expected_type: str
         raise HTTPException(401, "Token has expired")
     except jwt.PyJWTError:
         raise HTTPException(422, "Invalid token")
-    if blocklist.is_revoked(payload["jti"]):
-        raise HTTPException(401, "Token has been revoked")
     if payload.get("type") != expected_type:
         raise HTTPException(422, "Only %s tokens are allowed" % expected_type)
+    if blocklist.is_revoked(payload["jti"]):
+        raise HTTPException(401, "Token has been revoked")
     return TokenData(identity=str(payload["sub"]), jti=payload["jti"], type=payload["type"])
 
 
@@ -58,3 +59,12 @@ def get_refresh_token(creds: HTTPAuthorizationCredentials | None = Depends(_bear
 
 def unauthorized() -> HTTPException:
     return HTTPException(401, "Unauthorized")
+
+
+def get_own_store(store_id: int, token: TokenData, db: Session) -> Store:
+    store = db.get(Store, store_id)
+    if store is None:
+        raise HTTPException(404, "Not Found")
+    if store.user_id != token.user_id:
+        raise unauthorized()
+    return store
