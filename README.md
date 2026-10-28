@@ -227,6 +227,17 @@ These guides include:
 4. Create a store: `POST /store/` (use access token)
 5. Create an item: `POST /item/` (use access token)
 
+### Automated Tests (pytest)
+
+```bash
+pip install -r requirements-dev.txt
+python -m pytest tests
+```
+
+The suite builds the app through the factory against a temporary SQLite
+database and covers auth (register, login, refresh, logout revocation), users,
+stores, items, tags, per-user authorization, cascade deletes and `/health/`.
+
 ## Database Models
 
 ### User
@@ -256,9 +267,11 @@ These guides include:
 
 ### Environment Variables
 
-- `SECRET_KEY`: Secret key for JWT tokens (default: 'your-secret-key-change-me')
-- `DATABASE_URL`: Database connection string (PostgreSQL for production)
-- `DEV_DATABASE_URL`: Development database (SQLite by default)
+| Variable | Used by | Default | Description |
+|----------|---------|---------|-------------|
+| `SECRET_KEY` | all configs | `your-secret-key-change-me` | Secret used to sign JWTs. Set a strong value outside development. |
+| `DATABASE_URL` | production config | `postgresql://user:password@db:5432/appdb` | SQLAlchemy URL for the production database. |
+| `DEV_DATABASE_URL` | development config (`python run.py`) | `sqlite:///<repo>/data-dev.sqlite` | SQLAlchemy URL for the development database. |
 
 ### Token Expiration
 
