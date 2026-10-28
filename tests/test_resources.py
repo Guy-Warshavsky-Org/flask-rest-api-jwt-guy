@@ -1,5 +1,3 @@
-import pytest
-
 from app import db
 from app.models import Item, Store, Tag, User
 

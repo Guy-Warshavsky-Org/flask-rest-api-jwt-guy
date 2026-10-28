@@ -61,13 +61,16 @@ def bearer(token):
     return {"Authorization": f"Bearer {token}"}
 
 
+def _make_user(auth, username):
+    uid, access, refresh = auth.create_user(username)
+    return {"id": uid, "access": access, "refresh": refresh, "h": bearer(access)}
+
+
 @pytest.fixture()
 def user_a(auth):
-    uid, access, refresh = auth.create_user("alice")
-    return {"id": uid, "access": access, "refresh": refresh, "h": bearer(access)}
+    return _make_user(auth, "alice")
 
 
 @pytest.fixture()
 def user_b(auth):
-    uid, access, refresh = auth.create_user("bob")
-    return {"id": uid, "access": access, "refresh": refresh, "h": bearer(access)}
+    return _make_user(auth, "bob")
