@@ -1,6 +1,6 @@
 # Flask REST API with JWT Authentication
 
-A complete REST API built with Flask featuring JWT token authentication, user management, and CRUD operations for stores, items, and tags.
+A complete REST API built with FastAPI featuring JWT token authentication, user management, and CRUD operations for stores, items, and tags.
 
 ## Features
 
@@ -14,32 +14,28 @@ A complete REST API built with Flask featuring JWT token authentication, user ma
 
 ## Tech Stack
 
-- **Flask** - Web framework
+- **FastAPI / Uvicorn** - Web framework and ASGI server
 - **SQLAlchemy** - ORM for database operations
-- **Flask-JWT-Extended** - JWT token management
-- **Marshmallow** - Data validation and serialization
+- **PyJWT** - JWT token management
+- **Pydantic v2** - Data validation and serialization
 - **SQLite** - Development database (PostgreSQL ready for production)
 - **Docker** - Containerization support
 
 ## Project Structure
 
 ```
-flask_api/
 ├── app/
-│   ├── __init__.py           # App factory and JWT setup
-│   ├── models.py             # Database models
-│   ├── schemas.py            # Marshmallow schemas
-│   └── resources/            # API endpoints
-│       ├── users.py          # User routes
-│       ├── stores.py         # Store routes
-│       ├── items.py          # Item routes
-│       └── tags.py           # Tag routes
-├── config.py                 # Configuration settings
-├── run.py                    # Application entry point
-├── requirements.txt          # Python dependencies
-├── Dockerfile                # Docker configuration
-├── docker-compose.yml        # Docker Compose setup
-└── INSOMNIA_TESTING_GUIDE_*.txt  # Complete testing guides
+│   ├── main.py               # FastAPI app, error handlers, startup
+│   ├── deps.py               # DB session + JWT bearer dependencies
+│   ├── models.py             # SQLAlchemy 2.0 models
+│   ├── schemas.py            # Pydantic schemas
+│   ├── core/                 # settings, DB engine, JWT, blocklist
+│   └── routers/              # users, stores, items, tags, health
+├── tests/                    # pytest characterization tests
+├── requirements.txt
+├── Dockerfile
+├── docker-compose.yml
+└── INSOMNIA_TESTING_GUIDE_*.txt
 ```
 
 ## Installation
@@ -69,7 +65,7 @@ flask_api/
 
 5. **Run the application**
    ```bash
-   python run.py
+   uvicorn app.main:app --port 5000
    ```
 
 6. **Access the API**
@@ -279,7 +275,7 @@ These guides include:
 ### Common Issues
 
 **Connection Refused**
-- Make sure Flask server is running: `python run.py`
+- Make sure server is running: `uvicorn app.main:app --port 5000`
 - Check the URL: `http://127.0.0.1:5000`
 
 **401 Unauthorized**

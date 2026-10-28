@@ -29,7 +29,7 @@ data-dev.sqlite
 .DS_Store
 Thumbs.db
 
-# Flask
+# App
 instance/
 .pytest_cache/
 
